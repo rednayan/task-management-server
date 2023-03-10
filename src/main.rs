@@ -1,13 +1,13 @@
 mod api;
 mod model;
-mod respository;
+mod repository;
 
 use api::task::{
-    get_task
+    get_task, submit_task, start_task, pause_task, fail_task , complete_task
 };
 
 use actix_web::{HttpServer, App, web::Data, middleware::Logger};
-use respository::ddb::DDBRepository;
+use repository::ddb::DDBRepository;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -26,6 +26,11 @@ async fn main() -> std::io::Result<()> {
             .wrap(logger)
             .app_data(ddb_data)
             .service(get_task)
+            .service(submit_task)
+            .service(fail_task)
+            .service(pause_task)
+            .service(start_task)
+            .service(complete_task)
     })
     .bind(("127.0.0.1",8000))?
     .run()

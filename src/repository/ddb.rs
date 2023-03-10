@@ -64,11 +64,11 @@ impl DDBRepository {
             .item("pK",AttributeValue::S(String::from(task.user_uuid)))
             .item("sK",AttributeValue::S(String::from(task.task_uuid)))
             .item("task_type",AttributeValue::S(String::from(task.task_type)))
-            .item("state",AttributeValue::S(String::from(task.state)))
+            .item("state",AttributeValue::S(String::from(task.state.to_string())))
             .item("source_file",AttributeValue::S(String::from(task.source_file)));
 
-        if let Some(request_file) = task.result_file {
-            request = request.item("result_file", AttributeValue::S(String::from(task.result_file)))
+        if let Some(result_file) = task.result_file {
+            request = request.item("result_file", AttributeValue::S(String::from(result_file)))
         }
 
         match request.send().await {
@@ -103,7 +103,7 @@ impl DDBRepository {
                         let item = &items.first()?;
                         error!("{:?}",&item);
                         match item_to_task(item) {
-                            OK(task) => Some(task),
+                            Ok(task) => Some(task),
                             Err(_) => None
                         }
                     },
