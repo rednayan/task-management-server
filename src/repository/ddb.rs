@@ -39,7 +39,7 @@ fn item_to_task(item:&HashMap<String,AttributeValue>) -> Result<Task,DDBError> {
 
     let result_file = item_value("result_file",item)?;
 
-    OK(Task {
+    Ok(Task {
         user_uuid: required_item_value("pK",item)?,
         task_uuid: required_item_value("sK",item)?,
         task_type: required_item_value("task",item)?,
@@ -62,13 +62,13 @@ impl DDBRepository {
         let mut request = self.client.put_item()
             .table_name(&self.table_name)
             .item("pK",AttributeValue::S(String::from(task.user_uuid)))
-            .item("sK",AttributeValue::S(String::from(task,task_uuid)))
+            .item("sK",AttributeValue::S(String::from(task.task_uuid)))
             .item("task_type",AttributeValue::S(String::from(task.task_type)))
             .item("state",AttributeValue::S(String::from(task.state)))
             .item("source_file",AttributeValue::S(String::from(task.source_file)));
 
         if let Some(request_file) = task.result_file {
-            request = request.item("result_file", AttributeValue::S(String::from(result_file)))
+            request = request.item("result_file", AttributeValue::S(String::from(task.result_file)))
         }
 
         match request.send().await {
